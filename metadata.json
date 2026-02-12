@@ -1,0 +1,5 @@
+{
+  "name": "Forensic Ballistics Analyzer",
+  "description": "Professional forensic tool for analyzing air gun lethality based on unit area kinetic energy thresholds (20 J/cm²).",
+  "requestFramePermissions": []
+}
