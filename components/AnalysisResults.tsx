@@ -14,6 +14,16 @@ interface AnalysisResultsProps {
   aiReport: string;
 }
 
+const StatCard = ({ label, value, unit }: { label: string, value: string, unit: string }) => (
+  <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
+    <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">{label}</p>
+    <div className="flex items-baseline gap-1">
+      <span className="text-2xl font-bold text-slate-900 font-mono">{value}</span>
+      <span className="text-sm text-slate-400 font-medium">{unit}</span>
+    </div>
+  </div>
+);
+
 export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ stats, data, aiReport }) => {
   const chartData = data.map((d) => ({
     name: `#${d.id}`,
@@ -165,13 +175,3 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ stats, data, a
     </div>
   );
 };
-
-const StatCard = ({ label, value, unit }: { label: string, value: string, unit: string }) => (
-  <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
-    <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">{label}</p>
-    <div className="flex items-baseline gap-1">
-      <span className="text-2xl font-bold text-slate-900 font-mono">{value}</span>
-      <span className="text-sm text-slate-400 font-medium">{unit}</span>
-    </div>
-  </div>
-);
