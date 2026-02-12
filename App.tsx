@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Layout } from './components/Layout';
 import { InputSection } from './components/InputSection';
 import { AnalysisResults } from './components/AnalysisResults';
 import { calculateBallistics, calculateStatistics } from './services/mathUtils';
 import { generateForensicReport } from './services/geminiService';
-import { ShotData, BallisticStats, ProjectileParams, AnalysisStatus } from './types';
-import { DEFAULT_PROJECTILE, SAMPLE_DATA } from './constants';
+import { ShotData, BallisticStats, ProjectileParams, AnalysisStatus, ShotInput } from './types';
+import { DEFAULT_PROJECTILE } from './constants';
 
 const App: React.FC = () => {
   const [params, setParams] = useState<ProjectileParams>(DEFAULT_PROJECTILE);
-  const [velocities, setVelocities] = useState<number[]>([]);
+  const [shots, setShots] = useState<ShotInput[]>([]);
   const [shotData, setShotData] = useState<ShotData[]>([]);
   const [stats, setStats] = useState<BallisticStats | null>(null);
   const [aiReport, setAiReport] = useState<string>('');
@@ -19,11 +19,17 @@ const App: React.FC = () => {
     setStatus(AnalysisStatus.ANALYZING);
     
     // 1. Calculate Per-Shot Data
-    const calculatedShots: ShotData[] = velocities.map((v, index) => {
-      const { energyJoules, unitAreaEnergy } = calculateBallistics(v, params.diameterMm, params.weightGrams);
+    // We iterate through each shot input and use its SPECIFIC weight/diameter
+    const calculatedShots: ShotData[] = shots.map((input, index) => {
+      const { energyJoules, unitAreaEnergy } = calculateBallistics(
+        input.velocity, 
+        input.diameterMm, 
+        input.weightGrams
+      );
+      
       return {
+        ...input,
         id: index + 1,
-        velocity: v,
         energyJoules,
         unitAreaEnergy
       };
@@ -47,12 +53,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Optional: Load sample data on mount for demo
-  useEffect(() => {
-    // Only load sample if needed, here we leave it empty for the user to start fresh
-    // setVelocities(SAMPLE_DATA);
-  }, []);
-
   return (
     <Layout>
       <div className="max-w-5xl mx-auto space-y-8">
@@ -67,8 +67,8 @@ const App: React.FC = () => {
         <InputSection 
           params={params}
           setParams={setParams}
-          velocities={velocities}
-          setVelocities={setVelocities}
+          shots={shots}
+          setShots={setShots}
           onAnalyze={runAnalysis}
           isAnalyzing={status === AnalysisStatus.ANALYZING}
         />
