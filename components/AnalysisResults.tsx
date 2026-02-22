@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, 
-  ComposedChart
+  ComposedChart, ReferenceArea
 } from 'recharts';
 import { BallisticStats, ShotData } from '../types';
 import { LETHALITY_THRESHOLD } from '../constants';
@@ -35,6 +35,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ stats, data, a
 
   const isLethal = stats.isLethal;
   const test = stats.statisticalTest;
+  const [ciLower, ciUpper] = stats.confidenceInterval95;
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -139,7 +140,12 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ stats, data, a
 
         {/* Chart */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-[380px]">
-          <h3 className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">Energy Density Distribution</h3>
+          <h3 className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider flex justify-between items-center">
+            <span>Energy Density Distribution</span>
+            <span className="text-[10px] normal-case bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full border border-indigo-100">
+              Shaded: 95% CI of Mean
+            </span>
+          </h3>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -152,6 +158,16 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ stats, data, a
                 domain={[0, (dataMax: number) => Math.max(dataMax * 1.2, 25)]}
               />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f1f5f9' }} />
+              
+              <ReferenceArea 
+                yAxisId="left"
+                y1={ciLower} 
+                y2={ciUpper} 
+                fill="#6366f1" 
+                fillOpacity={0.1}
+                strokeOpacity={0}
+              />
+
               <ReferenceLine yAxisId="left" y={20} stroke="#ef4444" strokeDasharray="3 3" label={{ position: 'right', value: 'Threshold (20)', fill: '#ef4444', fontSize: 12 }} />
               <Bar yAxisId="left" dataKey="energy" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Unit Energy" />
             </ComposedChart>
